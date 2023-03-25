@@ -1,0 +1,153 @@
+Список всех команд, запускаемых в django shell:
+
+1.Создать двух пользователей (с помощью метода User.objects.create_user('username')).
+from news.models import *
+user1 = User.objects.create_user('noname1')
+user2 = User.objects.create_user('noname2')
+user1.save()
+user2.save()
+
+2.Создать два объекта модели Author, связанные с пользователями.
+author1 = Author.objects.create(user=user1)
+author2 = Author.objects.create(user=user2)
+author1.save()
+author2.save()
+
+3.Добавить 4 категории в модель Category.
+categ_science = Category.objects.create(name='Science')
+categ_food = Category.objects.create(name='Food')
+categ_sport = Category.objects.create(name='Sport')
+categ_animals = Category.objects.create(name='Animals')
+categ_science.save()
+categ_food.save()
+categ_sport.save()
+categ_animals.save()
+
+4.Добавить 2 статьи и 1 новость.
+5.Присвоить им категории (как минимум в одной статье/новости должно быть не меньше 2 категорий).
+post1 = Post.objects.create(author=author1, type=1, title='beautiful animals', post_text='Статья о краси
+вых животных')
+post1.category.set=categ_animals
+post1.save()
+post1.category.set=categ_food
+post1.save()
+post1.category.add(categ_animals)
+post1.save()
+post1.category.add(categ_food)
+post1.save()
+
+post2 = Post.objects.create(author=author1, type=0, title='School today', post_text='Новость о пребывани
+и в школах России сегодня.')
+post2.category.set=categ_science
+post2.save()
+post2.category.set=categ_food
+post2.save()
+post2.category.set=categ_sport
+post2.save()
+post2.category.add(categ_science)
+post2.save()
+post2.category.add(categ_food)
+post2.save()
+post2.category.add(categ_sport)
+post2.save()
+
+post3 =  Post.objects.create(author=author2, type=1, title='Turtle life problems', post_text='Статья о п
+роблемах жизни черепах в мире')
+post3.category.set=categ_science
+post3.save()
+post3.category.set=categ_animals
+post3.save()
+post3.category.add(categ_science)
+post3.save()
+post3.category.add(categ_animals)
+post3.save()
+
+6.Создать как минимум 4 комментария к разным объектам модели Post (в каждом объекте должен быть как минимум один комментарий).
+comm1 = Comment.objects.create(post=post1, user=user1, comment_text='У меня есть красивый котэ')
+comm1.save()
+comm2 = Comment.objects.create(post=post2, user=user2, comment_text='В моей школе плохо кормят!')
+comm2.save()
+comm3 = Comment.objects.create(post=post3, user=user1, comment_text='Я люблю черепах!')
+comm3.save()
+comm4 = Comment.objects.create(post=post2, user=user2, comment_text='Мне нравится моя школа')
+comm4.save()
+
+7.Применяя функции like() и dislike() к статьям/новостям и комментариям, скорректировать рейтинги этих объектов.
+post1.like()
+post1.like()
+post1.like()
+post1.like()
+post1.like()
+post1.like()
+post1.like()
+post2.like()
+post2.like()
+post2.like()
+post2.like()
+post2.like()
+post3.like()
+post3.like()
+post3.like()
+post1.save()
+post2.save()
+post3.save()
+post1.dislike()
+post1.dislike()
+post2.dislike() 
+post3.dislike()
+post1.save()
+post2.save()
+post3.save()
+comm1.like()
+comm1.like()
+comm1.like()
+comm1.like()
+comm2.like()
+comm2.like()
+comm2.like()
+comm3.like()
+comm3.like()
+comm3.like()
+comm3.dislike()
+comm4.like()
+comm4.like()
+comm4.dislike()
+comm1.save()
+comm2.save()
+comm3.save()
+comm4.save()
+
+8.Обновить рейтинги пользователей.
+auth1 = Author.objects.filter(id=1)
+auth1[0].author_rating
+1
+auth1[0].update_rating()
+auth1[0].author_rating
+52
+auth2 = Author.objects.filter(id=2)
+auth2[0].author_rating
+1
+auth2[0].update_rating()
+auth2[0].author_rating
+18
+
+9.Вывести username и рейтинг лучшего пользователя (применяя сортировку и возвращая поля первого объекта).
+User.objects.filter(id=Author.objects.all().order_by('-author_rating').values('user', 'author_rating').f
+irst()['user'])[0].username, Author.objects.all().order_by('-author_rating').values('author_rating').first()
+['author_rating']
+('noname1', 52)
+
+10.Вывести дату добавления, username автора, рейтинг, заголовок и превью лучшей статьи, основываясь на лайках/дислайках к этой статье.
+Post.objects.all().order_by('-post_rating').values('date_time_create', 'author', 'post_rating', 'title')
+.first()
+{'date_time_create': datetime.datetime(2023, 3, 25, 13, 9, 0, 30044, tzinfo=datetime.timezone.utc), 'author'
+: 1, 'post_rating': 6, 'title': 'beautiful animals'}
+
+Post.objects.all().order_by('-post_rating').first().preview()
+'Статья о красивых животных'
+
+11.Вывести все комментарии (дата, пользователь, рейтинг, текст) к этой статье.
+Comment.objects.filter(post_id=Post.objects.all().order_by('-post_rating').first().id).values()
+<QuerySet [{'id': 1, 'post_id': 1, 'user_id': 9, 'comment_text': 'У меня есть красивый котэ', 'date_time_cre
+ate': datetime.datetime(2023, 3, 25, 13, 10, 27, 329533, tzinfo=datetime.timezone.utc), 'comment_rating': 5}
+]>
