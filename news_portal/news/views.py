@@ -37,7 +37,7 @@ class AddNew(CreateView):
 
     def form_valid(self, form):
         post = form.save(commit=False)
-        post.post_type = Post.objects.filter(type=0)
+        post.post_type = 0
         return super().form_valid(form)
 
 
